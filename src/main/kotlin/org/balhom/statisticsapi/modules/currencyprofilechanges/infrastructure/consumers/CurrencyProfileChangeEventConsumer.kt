@@ -1,5 +1,6 @@
 package org.balhom.statisticsapi.modules.currencyprofilechanges.infrastructure.consumers
 
+import io.smallrye.common.annotation.Blocking
 import jakarta.enterprise.context.ApplicationScoped
 import org.balhom.statisticsapi.modules.currencyprofilechanges.application.CurrencyProfileChangesService
 import org.balhom.statisticsapi.modules.currencyprofilechanges.infrastructure.consumers.data.CurrencyProfileChangeEvent
@@ -11,6 +12,7 @@ class CurrencyProfileChangeEventConsumer(
 ) {
 
     @Incoming("currency-profile-events")
+    @Blocking
     fun receive(event: CurrencyProfileChangeEvent) {
         currencyProfileChangesService
             .processChange(

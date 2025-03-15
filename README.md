@@ -16,15 +16,6 @@ statistics.
 | KEYCLOAK_URL                                       | Keycloak instance url. Ex: http://localhost:7080                                                               |
 | KEYCLOAK_REALM                                     | Keycloak instance realm name. Default: balhom-realm                                                            |
 | KEYCLOAK_CLIENT_ID                                 | Keycloak instance client id. Default: balhom-client                                                            |
-| KEYCLOAK_API_CLIENT_ID                             | Keycloak instance client id for the API to read user data. Default: balhom-api-client                          |
-| KEYCLOAK_API_CLIENT_SECRET                         | Keycloak instance client secret for the API to read user data                                                  |
-| MONGODB_URL                                        | Mongo instance url                                                                                             |
-| MONGODB_DB                                         | Mongo instance database name                                                                                   |
-| S3_URL                                             | S3 url                                                                                                         |
-| S3_REGION                                          | S3 region. Default: us-west-2                                                                                  |
-| S3_ACCESS_KEY                                      | S3 access key                                                                                                  |
-| S3_SECRET_KEY                                      | S3 secret key                                                                                                  |
-| S3_BUCKET_NAME                                     | S3 bucket name. Default: balhom-currency-api-bucket                                                            |
 | KAFKA_SERVERS                                      | Kafka server urls                                                                                              |
 | QUARKUS_HTTP_CORS_ORIGINS                          | CORS origins                                                                                                   |
 | QUARKUS_HTTP_CORS_ORIGINS                          | CORS origins. Optional                                                                                         |
