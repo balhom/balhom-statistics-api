@@ -26,7 +26,11 @@ RUN chown 1001 /work \
     && chown 1001:root /work
 COPY --chown=1001:root --chmod=0755 target/*-runner /work/application
 
-EXPOSE 8080
+ENV LANGUAGE='en_US:en'
+ENV TZ=UTC
+ENV QUARKUS_PROFILE=prod
+
+EXPOSE 8083
 USER 1001
 
 ENTRYPOINT ["./application", "-Dquarkus.http.host=0.0.0.0"]
