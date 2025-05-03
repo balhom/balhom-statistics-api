@@ -1,0 +1,263 @@
+version: '2'
+
+services:
+
+  # Cassandra Section
+
+  balhom-statistics-api-cassandra:
+    image: bitnami/cassandra:5.0.3
+    container_name: balhom-statistics-api-cassandra
+    environment:
+      CASSANDRA_USER: admin
+      CASSANDRA_PASSWORD: password
+      CASSANDRA_CLUSTER_NAME: balhom-cluster
+      CASSANDRA_DATACENTER: dc1
+    ports:
+      - "9042:9042"
+    volumes:
+      - balhom-statistics-api-cassandra-volume:/bitnami
+    networks:
+      balhom-statistics-api-cassandra-net:
+    restart: unless-stopped
+
+  # Transactions API Section
+
+  balhom-transactions-api:
+    image: fabbo/balhom-transactions-api:0.0.1
+    container_name: balhom-transactions-api
+    ports:
+      - "8082:8082"
+    environment:
+      - KEYCLOAK_URL=http://balhom-keycloak:8080
+      - QUARKUS_OIDC_TOKEN_ISSUER=http://localhost:7080/realms/balhom-realm
+      - KEYCLOAK_REALM=balhom-realm
+      - KEYCLOAK_CLIENT_ID=balhom-client
+      - KEYCLOAK_API_CLIENT_ID=balhom-api-client
+      - KEYCLOAK_API_CLIENT_SECRET=secretKey
+      - POSTGRES_URL=jdbc:postgresql://balhom-transactions-api-postgres:5432/balhom_transaction_db
+      - POSTGRES_USERNAME=admin
+      - POSTGRES_PASSWORD=password
+      - S3_URL=http://balhom-minio:9090
+      - S3_ACCESS_KEY=admin
+      - S3_SECRET_KEY=password
+      - S3_BUCKET_NAME=balhom-bucket
+      - KAFKA_SERVERS=PLAINTEXT://balhom-kafka:9092
+    networks:
+      balhom-transactions-api-net:
+    restart: unless-stopped
+
+  # Currency Profiles API Section
+
+  balhom-currency-profiles-api:
+    image: fabbo/balhom-currency-profiles-api:0.0.1
+    container_name: balhom-currency-profiles-api
+    ports:
+      - "8081:8081"
+    environment:
+      - KEYCLOAK_URL=http://balhom-keycloak:8080
+      - QUARKUS_OIDC_TOKEN_ISSUER=http://localhost:7080/realms/balhom-realm
+      - KEYCLOAK_REALM=balhom-realm
+      - KEYCLOAK_CLIENT_ID=balhom-client
+      - KEYCLOAK_API_CLIENT_ID=balhom-api-client
+      - KEYCLOAK_API_CLIENT_SECRET=secretKey
+      - MONGODB_URL=mongodb://admin:password@balhom-currency-profiles-api-mongodb:27017
+      - MONGODB_DB=balHomCurrencyDB
+      - S3_URL=http://balhom-minio:9090
+      - S3_ACCESS_KEY=admin
+      - S3_SECRET_KEY=password
+      - S3_BUCKET_NAME=balhom-bucket
+      - KAFKA_SERVERS=PLAINTEXT://balhom-kafka:9092
+    networks:
+      balhom-currency-profiles-api-net:
+    restart: unless-stopped
+
+  # Keycloak Section
+
+  balhom-keycloak:
+    image: fabbo/balhom-keycloak:1.0.0
+    container_name: balhom-keycloak
+    ports:
+      - "7080:8080"
+    environment:
+      - KEYCLOAK_DATABASE_HOST=balhom-keycloak-db
+      - KEYCLOAK_DATABASE_PORT=5432
+      - KEYCLOAK_DATABASE_NAME=balhomdb
+      - KEYCLOAK_DATABASE_USER=keycloak_user
+      - KEYCLOAK_DATABASE_PASSWORD=password
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=password
+      - KEYCLOAK_MANAGEMENT_USER=manager
+      - KEYCLOAK_MANAGEMENT_PASSWORD=password
+      - KEYCLOAK_INIT_REALM=balhom-realm
+      - KEYCLOAK_INIT_CLIENT=balhom-client
+      - KEYCLOAK_INIT_USER=test@balhom.com
+      - KEYCLOAK_INIT_USER_PASSWORD=password
+      - KEYCLOAK_INIT_API_CLIENT=balhom-api-client
+      - KEYCLOAK_INIT_API_CLIENT_SECRET=secretKey
+    user: root
+    networks:
+      balhom-keycloak-net:
+    restart: unless-stopped
+
+  balhom-keycloak-db:
+    image: postgres:17.2
+    container_name: balhom-keycloak-db
+    environment:
+      - POSTGRES_DB=balhomdb
+      - POSTGRES_USER=keycloak_user
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - balhom-keycloak-db-volume:/var/lib/postgresql/data
+    networks:
+      balhom-keycloak-net:
+    restart: unless-stopped
+
+  # MongoDB Section
+
+  balhom-currency-profiles-api-mongodb:
+    image: mongo:5.0.31
+    container_name: balhom-currency-profiles-api-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    volumes:
+      - balhom-currency-profiles-api-mongodb-volume:/data/db
+    networks:
+      balhom-currency-profiles-api-net:
+      balhom-currency-profiles-api-mongodb-net:
+    restart: unless-stopped
+
+  balhom-currency-profiles-api-mongo-express:
+    image: mongo-express:1.0.2
+    container_name: balhom-currency-profiles-api-mongo-express
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_SERVER: balhom-currency-profiles-api-mongodb
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: password
+    ports:
+      - "7091:8081"
+    networks:
+      balhom-currency-profiles-api-mongodb-net:
+    depends_on:
+      - balhom-currency-profiles-api-mongodb
+
+  # Postgres Section
+
+  balhom-transactions-api-postgres:
+    image: postgres:17.2
+    container_name: balhom-transactions-api-postgres
+    environment:
+      - POSTGRES_DB=balhom_transaction_db
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - balhom-transactions-api-postgres-volume:/var/lib/postgresql/data
+    networks:
+      balhom-transactions-api-net:
+      balhom-transactions-api-postgres-net:
+    restart: unless-stopped
+
+  balhom-transactions-api-pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: balhom-transactions-api-pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@mail.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+    ports:
+      - "9080:80"
+    depends_on:
+      - balhom-transactions-api-postgres
+    restart: unless-stopped
+    networks:
+      balhom-transactions-api-postgres-net:
+
+  # Kafka Section
+
+  balhom-zookeeper:
+    image: confluentinc/cp-zookeeper:7.8.0
+    container_name: balhom-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 22181
+      ZOOKEEPER_TICK_TIME: 2000
+    restart: unless-stopped
+    ports:
+      - "22181:2181"
+    networks:
+      balhom-kafka-net:
+
+  balhom-kafka:
+    image: confluentinc/cp-kafka:7.8.0
+    container_name: balhom-kafka
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: balhom-zookeeper:22181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://balhom-kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    restart: unless-stopped
+    networks:
+      balhom-kafka-net:
+    depends_on:
+      - balhom-zookeeper
+
+  balhom-api-kafdrop:
+    image: obsidiandynamics/kafdrop:4.1.0
+    container_name: balhom-kafdrop
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: balhom-kafka:9092
+      JVM_OPTS: -Xms32M -Xmx64M
+    restart: unless-stopped
+    networks:
+      balhom-kafka-net:
+    depends_on:
+      - balhom-kafka
+
+  # MinIO Section
+
+  balhom-minio:
+    image: bitnami/minio:2025.2.3
+    container_name: balhom-minio
+    ports:
+      - "9090:9090"
+      - "9091:9091"
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+      - MINIO_DEFAULT_BUCKET=balhom-bucket
+    restart: unless-stopped
+    command: [ "/bin/bash", "-c", "/scripts/entrypoint.sh" ]
+    volumes:
+      - balhom-minio-volume:/bitnami/minio/data
+      - ./minio/scripts/entrypoint.sh:/scripts/entrypoint.sh
+    networks:
+      - balhom-minio-net
+
+volumes:
+  balhom-statistics-api-cassandra-volume:
+  balhom-transactions-api-postgres-volume:
+  balhom-currency-profiles-api-mongodb-volume:
+  balhom-keycloak-db-volume:
+  balhom-kafka-volume:
+  balhom-minio-volume:
+
+networks:
+  balhom-statistics-api-cassandra-net:
+  balhom-transactions-api-net:
+  balhom-currency-profiles-api-net:
+  balhom-transactions-api-postgres-net:
+  balhom-currency-profiles-api-mongodb-net:
+  balhom-keycloak-net:
+  balhom-kafka-net:
+  balhom-minio-net:
