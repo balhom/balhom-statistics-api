@@ -16,7 +16,12 @@ statistics.
 | KEYCLOAK_URL                                       | Keycloak instance url. Ex: http://localhost:7080                                                               |
 | KEYCLOAK_REALM                                     | Keycloak instance realm name. Default: balhom-realm                                                            |
 | KEYCLOAK_CLIENT_ID                                 | Keycloak instance client id. Default: balhom-client                                                            |
+| KEYCLOAK_API_CLIENT_ID                             | Keycloak instance client id for the API to read user data. Default: balhom-api-client                          |
+| KEYCLOAK_API_CLIENT_SECRET                         | Keycloak instance client secret for the API to read user data                                                  |
+| MONGODB_URL                                        | Mongo instance url                                                                                             |
+| MONGODB_DB                                         | Mongo instance database name. Default: balHomStatisticsDB                                                      |
 | KAFKA_SERVERS                                      | Kafka server urls                                                                                              |
+| CURRENCY_PROFILES_API_URL                          | Currency Profiles API instance url. Ex: http://balhom-currency-profiles-api:8081                               |
 | QUARKUS_HTTP_CORS_ORIGINS                          | CORS origins                                                                                                   |
 | QUARKUS_HTTP_CORS_ORIGINS                          | CORS origins. Optional                                                                                         |
 | QUARKUS_HTTP_CORS_HEADERS                          | Headers allowed. Optional                                                                                      |
@@ -26,12 +31,13 @@ statistics.
 
 ## Error Codes
 
-| Code | Description |
-|------|-------------|
-|      |             |
+| Code | Description                            |
+|------|----------------------------------------|
+| 200  | "Currency profile reference not found" |
 
 > **1 to 99** Generic errors \
-> **100 to 199** Statistics related errors
+> **100 to 199** Statistics related errors \
+> **200 to 299** Currency Profile Changes related errors
 
 ## Service Development
 

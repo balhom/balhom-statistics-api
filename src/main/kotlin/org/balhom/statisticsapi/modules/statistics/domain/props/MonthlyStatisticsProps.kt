@@ -1,8 +1,8 @@
 package org.balhom.statisticsapi.modules.statistics.domain.props
 
-import java.util.UUID
+import org.balhom.statisticsapi.common.data.props.ObjectIdUserProps
 
 data class MonthlyStatisticsProps(
-    val userId: UUID,
+    val currencyProfileIdAndUser: ObjectIdUserProps,
     val year: Int,
 )

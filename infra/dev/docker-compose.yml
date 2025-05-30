@@ -2,24 +2,6 @@ version: '2'
 
 services:
 
-  # Cassandra Section
-
-  balhom-statistics-api-cassandra:
-    image: bitnami/cassandra:5.0.3
-    container_name: balhom-statistics-api-cassandra
-    environment:
-      CASSANDRA_USER: admin
-      CASSANDRA_PASSWORD: password
-      CASSANDRA_CLUSTER_NAME: balhom-cluster
-      CASSANDRA_DATACENTER: dc1
-    ports:
-      - "9042:9042"
-    volumes:
-      - balhom-statistics-api-cassandra-volume:/bitnami
-    networks:
-      balhom-statistics-api-cassandra-net:
-    restart: unless-stopped
-
   # Transactions API Section
 
   balhom-transactions-api:
@@ -60,7 +42,7 @@ services:
       - KEYCLOAK_CLIENT_ID=balhom-client
       - KEYCLOAK_API_CLIENT_ID=balhom-api-client
       - KEYCLOAK_API_CLIENT_SECRET=secretKey
-      - MONGODB_URL=mongodb://admin:password@balhom-currency-profiles-api-mongodb:27017
+      - MONGODB_URL=mongodb://admin:password@balhom-mongodb:27017
       - MONGODB_DB=balHomCurrencyDB
       - S3_URL=http://balhom-minio:9090
       - S3_ACCESS_KEY=admin
@@ -114,37 +96,37 @@ services:
 
   # MongoDB Section
 
-  balhom-currency-profiles-api-mongodb:
+  balhom-mongodb:
     image: mongo:5.0.31
-    container_name: balhom-currency-profiles-api-mongodb
+    container_name: balhom-mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
     ports:
       - "27017:27017"
     volumes:
-      - balhom-currency-profiles-api-mongodb-volume:/data/db
+      - balhom-mongodb-volume:/data/db
     networks:
       balhom-currency-profiles-api-net:
-      balhom-currency-profiles-api-mongodb-net:
+      balhom-mongodb-net:
     restart: unless-stopped
 
-  balhom-currency-profiles-api-mongo-express:
+  balhom-mongo-express:
     image: mongo-express:1.0.2
-    container_name: balhom-currency-profiles-api-mongo-express
+    container_name: balhom-mongo-express
     restart: unless-stopped
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: password
-      ME_CONFIG_MONGODB_SERVER: balhom-currency-profiles-api-mongodb
+      ME_CONFIG_MONGODB_SERVER: balhom-mongodb
       ME_CONFIG_BASICAUTH_USERNAME: admin
       ME_CONFIG_BASICAUTH_PASSWORD: password
     ports:
       - "7091:8081"
     networks:
-      balhom-currency-profiles-api-mongodb-net:
+      balhom-mongodb-net:
     depends_on:
-      - balhom-currency-profiles-api-mongodb
+      - balhom-mongodb
 
   # Postgres Section
 
@@ -247,17 +229,16 @@ services:
 volumes:
   balhom-statistics-api-cassandra-volume:
   balhom-transactions-api-postgres-volume:
-  balhom-currency-profiles-api-mongodb-volume:
+  balhom-mongodb-volume:
   balhom-keycloak-db-volume:
   balhom-kafka-volume:
   balhom-minio-volume:
 
 networks:
-  balhom-statistics-api-cassandra-net:
   balhom-transactions-api-net:
   balhom-currency-profiles-api-net:
   balhom-transactions-api-postgres-net:
-  balhom-currency-profiles-api-mongodb-net:
+  balhom-mongodb-net:
   balhom-keycloak-net:
   balhom-kafka-net:
   balhom-minio-net:

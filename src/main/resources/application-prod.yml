@@ -1,0 +1,41 @@
+quarkus:
+  log:
+    level: INFO
+
+  oidc:
+    auth-server-url: ${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM:balhom-realm}
+    client-id: ${KEYCLOAK_CLIENT_ID:balhom-client}
+    application-type: service
+
+  mongodb:
+    connection-string: ${MONGODB_URL}
+    database: ${MONGODB_DB:balHomStatisticsDB}
+
+  smallrye-openapi:
+    enable: false
+
+  swagger-ui:
+    enable: false
+
+  rest-client:
+    currency-profiles-api:
+      url: ${CURRENCY_PROFILES_API_URL}
+      scope: jakarta.inject.Singleton
+
+kafka:
+  bootstrap:
+    servers: ${KAFKA_SERVERS}
+
+mp:
+  messaging:
+    incoming:
+      transaction-events:
+        connector: smallrye-kafka
+        topic: transaction-events
+        group:
+          id: statistics-group
+      currency-profile-events:
+        connector: smallrye-kafka
+        topic: currency-profile-events
+        group:
+          id: statistics-group

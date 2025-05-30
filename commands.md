@@ -17,3 +17,9 @@ mvn quarkus:add-extension "-Dextensions=quarkus-config-yaml"
 ~~~
 mvn quarkus:add-extension "-Dextensions=oidc"
 ~~~
+
+* Install Cassandra Client
+
+~~~
+mvn quarkus:add-extension "-Dextensions=com.datastax.oss.quarkus:cassandra-quarkus-client"
+~~~

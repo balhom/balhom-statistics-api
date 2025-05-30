@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.balhom</groupId>
     <artifactId>balhom-statistics-api</artifactId>
@@ -19,6 +20,7 @@
         <rest-assured.version>5.5.0</rest-assured.version>
         <jackson.version>2.18.2</jackson.version>
         <mockito-kotlin.version>5.4.0</mockito-kotlin.version>
+        <testcontainers.version>1.20.4</testcontainers.version>
     </properties>
 
     <dependencyManagement>
@@ -30,6 +32,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>quarkus-cassandra-bom</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -37,6 +46,12 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest-jackson</artifactId>
+            <version>${quarkus.platform.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client-jackson</artifactId>
             <version>${quarkus.platform.version}</version>
         </dependency>
 
@@ -78,7 +93,19 @@
 
         <dependency>
             <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client-oidc-token-propagation</artifactId>
+            <version>${quarkus.platform.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-hibernate-validator</artifactId>
+            <version>${quarkus.platform.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-mongodb-panache-kotlin</artifactId>
             <version>${quarkus.platform.version}</version>
         </dependency>
 
@@ -142,16 +169,33 @@
         </dependency>
 
         <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mongodb</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>kafka</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-test-security</artifactId>
             <version>${quarkus.platform.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test</artifactId>
@@ -211,7 +255,8 @@
                 </executions>
                 <configuration>
                     <systemPropertyVariables>
-                        <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
+                        <native.image.path>${project.build.directory}/${project.build.finalName}-runner
+                        </native.image.path>
                         <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                         <maven.home>${maven.home}</maven.home>
                     </systemPropertyVariables>
@@ -243,18 +288,25 @@
                         <artifactId>kotlin-maven-allopen</artifactId>
                         <version>${kotlin.version}</version>
                     </dependency>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-noarg</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
                 </dependencies>
                 <configuration>
                     <javaParameters>true</javaParameters>
-                    <jvmTarget>1.8</jvmTarget>
+                    <jvmTarget>17</jvmTarget>
                     <compilerPlugins>
                         <plugin>all-open</plugin>
+                        <plugin>no-arg</plugin>
                     </compilerPlugins>
                     <pluginOptions>
                         <option>all-open:annotation=jakarta.ws.rs.Path</option>
                         <option>all-open:annotation=jakarta.enterprise.context.ApplicationScoped</option>
                         <option>all-open:annotation=jakarta.persistence.Entity</option>
                         <option>all-open:annotation=io.quarkus.test.junit.QuarkusTest</option>
+                        <option>no-arg:annotation=io.quarkus.mongodb.panache.common.MongoEntity</option>
                     </pluginOptions>
                 </configuration>
             </plugin>

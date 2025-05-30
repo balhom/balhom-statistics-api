@@ -1,12 +1,19 @@
 package org.balhom.statisticsapi.modules.transactionchanges.domain.props
 
 import org.balhom.statisticsapi.common.data.enums.EventChangeTypeEnum
-import java.util.UUID
+import org.balhom.statisticsapi.modules.transactionchanges.domain.enums.TransactionTypeEnum
+import java.math.BigDecimal
+import java.time.LocalDateTime
+import java.util.*
 
 data class TransactionChangeProps(
     val eventChangeTypeEnum: EventChangeTypeEnum,
-    val transactionId: UUID,
+    val id: UUID,
+    var type: TransactionTypeEnum,
+    val date: LocalDateTime,
     val currencyProfileId: UUID,
     val userId: UUID,
-    val sum: Double,
+    val sum: BigDecimal,
+    var cpGoalMonthlySaving: BigDecimal,
+    var cpGoalYearlySaving: BigDecimal,
 )

@@ -9,16 +9,17 @@ import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
+import org.balhom.statisticsapi.common.data.props.ObjectIdUserProps
 import org.balhom.statisticsapi.modules.statistics.application.TransactionStatisticsService
 import org.balhom.statisticsapi.modules.statistics.domain.models.DailyTransactionStatistic
 import org.balhom.statisticsapi.modules.statistics.domain.models.MonthlyTransactionStatistic
 import org.balhom.statisticsapi.modules.statistics.domain.props.DailyStatisticsProps
 import org.balhom.statisticsapi.modules.statistics.domain.props.MonthlyStatisticsProps
 import org.eclipse.microprofile.jwt.JsonWebToken
-import java.util.UUID
+import java.util.*
 
 @Path(TransactionStatisticsResource.RESOURCE_PATH)
-@Consumes(MediaType.MULTIPART_FORM_DATA)
+@Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Authenticated
 class TransactionStatisticsResource(
@@ -34,11 +35,17 @@ class TransactionStatisticsResource(
     @GET
     @Path("/monthly")
     fun getMonthlyTransactionStatistics(
+        @QueryParam("currencyProfileId") currencyProfileId: UUID,
         @QueryParam("year") year: Int
     ): Uni<List<MonthlyTransactionStatistic>> {
+        val currencyProfileIdAndUser = ObjectIdUserProps(
+            currencyProfileId,
+            UUID.fromString(jwt.subject)
+        )
+
         return service.getMonthlyStatistics(
             MonthlyStatisticsProps(
-                UUID.fromString(jwt.subject),
+                currencyProfileIdAndUser,
                 year
             )
         )
@@ -47,12 +54,18 @@ class TransactionStatisticsResource(
     @GET
     @Path("/daily")
     fun getDailyTransactionStatistics(
+        @QueryParam("currencyProfileId") currencyProfileId: UUID,
         @QueryParam("month") month: Int,
         @QueryParam("year") year: Int
     ): Uni<List<DailyTransactionStatistic>> {
+        val currencyProfileIdAndUser = ObjectIdUserProps(
+            currencyProfileId,
+            UUID.fromString(jwt.subject)
+        )
+
         return service.getDailyStatistics(
             DailyStatisticsProps(
-                UUID.fromString(jwt.subject),
+                currencyProfileIdAndUser,
                 month,
                 year
             )
