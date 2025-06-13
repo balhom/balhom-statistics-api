@@ -25,7 +25,7 @@ class SavingsStatisticsResource(
     private val service: SavingsStatisticsService
 ) {
     companion object {
-        const val RESOURCE_PATH = "/api/v1/savings"
+        const val RESOURCE_PATH = "/api/v1/statistics/savings"
 
         const val GET_MONTHLY_PATH = "/monthly"
     }

@@ -26,7 +26,7 @@ class TransactionStatisticsResource(
     private val service: TransactionStatisticsService
 ) {
     companion object {
-        const val RESOURCE_PATH = "/api/v1/transactions"
+        const val RESOURCE_PATH = "/api/v1/statistics/transactions"
     }
 
     @Inject
