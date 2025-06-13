@@ -5,7 +5,7 @@ import org.balhom.statisticsapi.modules.statistics.domain.models.YearlySavingsSt
 import java.math.BigDecimal
 import java.util.*
 
-@MongoEntity(collection = DailyTransactionStatisticMongoEntity.COLLECTION_NAME)
+@MongoEntity(collection = YearlySavingsStatisticMongoEntity.COLLECTION_NAME)
 data class YearlySavingsStatisticMongoEntity(
     var id: String,
     var currencyProfileId: UUID,
