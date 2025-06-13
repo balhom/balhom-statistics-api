@@ -23,16 +23,17 @@ class SavingsStatisticsService(
         val userId = props.currencyProfileIdAndUser.userId
         val currencyProfileId = props.currencyProfileIdAndUser.id
 
-        currencyProfileService.getCurrencyProfileReferenceAndValidate(
+        return currencyProfileService.getCurrencyProfileReferenceAndValidate(
             userId,
             currencyProfileId
         )
-
-        return monthlySavingsStatisticsRepository
-            .findAllByCurrencyProfileIdAndYear(
-                currencyProfileId,
-                props.year
-            )
+            .chain { _ ->
+                monthlySavingsStatisticsRepository
+                    .findAllByCurrencyProfileIdAndYear(
+                        currencyProfileId,
+                        props.year
+                    )
+            }
     }
 
     fun getYearlyStatistics(props: ObjectIdUserProps):
@@ -40,15 +41,16 @@ class SavingsStatisticsService(
         val userId = props.userId
         val currencyProfileId = props.id
 
-        currencyProfileService.getCurrencyProfileReferenceAndValidate(
+        return currencyProfileService.getCurrencyProfileReferenceAndValidate(
             userId,
             currencyProfileId
         )
-
-        return yearlySavingsStatisticsRepository
-            .findAllByCurrencyProfileId(
-                currencyProfileId
-            )
+            .chain { _ ->
+                yearlySavingsStatisticsRepository
+                    .findAllByCurrencyProfileId(
+                        currencyProfileId
+                    )
+            }
     }
 
     fun addSum(props: SumSavingsStatisticProps) {

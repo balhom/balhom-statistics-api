@@ -1,6 +1,6 @@
 quarkus:
   log:
-    level: DEBUG
+    level: INFO
 
   oidc:
     auth-server-url: http://localhost:7080/realms/balhom-realm
@@ -26,7 +26,7 @@ quarkus:
 
 kafka:
   bootstrap:
-    servers: PLAINTEXT_HOST://localhost:29092
+    servers: PLAINTEXT_HOST://localhost:9092
 
 mp:
   messaging:

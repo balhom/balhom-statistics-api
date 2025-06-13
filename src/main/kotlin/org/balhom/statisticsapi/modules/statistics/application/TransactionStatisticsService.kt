@@ -23,16 +23,17 @@ class TransactionStatisticsService(
         val userId = props.currencyProfileIdAndUser.userId
         val currencyProfileId = props.currencyProfileIdAndUser.id
 
-        currencyProfileService.getCurrencyProfileReferenceAndValidate(
+        return currencyProfileService.getCurrencyProfileReferenceAndValidate(
             userId,
             currencyProfileId
         )
-
-        return monthlyTransactionStatisticRepository
-            .findAllByCurrencyProfileIdAndYear(
-                currencyProfileId,
-                props.year
-            )
+            .chain { _ ->
+                monthlyTransactionStatisticRepository
+                    .findAllByCurrencyProfileIdAndYear(
+                        currencyProfileId,
+                        props.year
+                    )
+            }
     }
 
     fun getDailyStatistics(props: DailyStatisticsProps):
@@ -40,17 +41,18 @@ class TransactionStatisticsService(
         val userId = props.currencyProfileIdAndUser.userId
         val currencyProfileId = props.currencyProfileIdAndUser.id
 
-        currencyProfileService.getCurrencyProfileReferenceAndValidate(
+        return currencyProfileService.getCurrencyProfileReferenceAndValidate(
             userId,
             currencyProfileId
         )
-
-        return dailyTransactionStatisticRepository
-            .findAllByCurrencyProfileIdAndMonthAndYear(
-                currencyProfileId,
-                props.month,
-                props.year
-            )
+            .chain { _ ->
+                dailyTransactionStatisticRepository
+                    .findAllByCurrencyProfileIdAndMonthAndYear(
+                        currencyProfileId,
+                        props.month,
+                        props.year
+                    )
+            }
     }
 
     fun addSum(props: SumTransactionStatisticProps) {
