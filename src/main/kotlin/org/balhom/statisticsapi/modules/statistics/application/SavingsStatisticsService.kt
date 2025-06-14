@@ -62,7 +62,7 @@ class SavingsStatisticsService(
                 year = props.date.year
             )
         monthlyStatistic.savings += props.sum
-        monthlyStatistic.goal += props.monthlyGoal
+        monthlyStatistic.goal = props.monthlyGoal
 
         // Add sum and goals for monthly statistic
         val yearlyStatistic = yearlySavingsStatisticsRepository
@@ -71,7 +71,7 @@ class SavingsStatisticsService(
                 year = props.date.year
             )
         yearlyStatistic.savings += props.sum
-        yearlyStatistic.goal += props.yearlyGoal
+        yearlyStatistic.goal = props.yearlyGoal
 
         monthlySavingsStatisticsRepository.save(
             monthlyStatistic
