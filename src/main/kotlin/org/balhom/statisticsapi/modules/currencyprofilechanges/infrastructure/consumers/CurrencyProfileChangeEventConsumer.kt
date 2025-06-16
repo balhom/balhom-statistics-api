@@ -15,7 +15,7 @@ class CurrencyProfileChangeEventConsumer(
     @Incoming("currency-profile-events")
     @Blocking
     fun receive(event: CurrencyProfileChangeEvent) {
-        Log.debug("Consuming Kafka currency profile event: " + event.id)
+        Log.info("Consuming Kafka currency profile event: " + event.id)
 
         currencyProfileChangesService
             .processChange(
