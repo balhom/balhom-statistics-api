@@ -9,23 +9,6 @@ quarkus:
   mongodb:
     uuid-representation: STANDARD
 
-kafka:
-  consumer:
-    reconnect:
-      backoff:
-        ms: 1000
-        max:
-          ms: 10000
-    retry:
-      backoff:
-        ms: 1000
-    request:
-      timeout:
-        ms: 30000
-    session:
-      timeout:
-        ms: 30000
-
 mp:
   messaging:
     incoming:
