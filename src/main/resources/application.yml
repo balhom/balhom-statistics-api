@@ -5,5 +5,6 @@ quarkus:
     host: 0.0.0.0
     port: 8083
     cors: true
+    idle-timeout: 5m
   mongodb:
     uuid-representation: STANDARD
