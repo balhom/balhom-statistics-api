@@ -11,10 +11,13 @@ import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
 import org.balhom.statisticsapi.common.data.props.ObjectIdUserProps
 import org.balhom.statisticsapi.modules.statistics.application.TransactionStatisticsService
+import org.balhom.statisticsapi.modules.statistics.domain.models.CategoryTransactionStatistic
 import org.balhom.statisticsapi.modules.statistics.domain.models.DailyTransactionStatistic
 import org.balhom.statisticsapi.modules.statistics.domain.models.MonthlyTransactionStatistic
+import org.balhom.statisticsapi.modules.statistics.domain.props.CategoryStatisticsProps
 import org.balhom.statisticsapi.modules.statistics.domain.props.DailyStatisticsProps
 import org.balhom.statisticsapi.modules.statistics.domain.props.MonthlyStatisticsProps
+import org.balhom.statisticsapi.modules.transactionchanges.domain.enums.TransactionTypeEnum
 import org.eclipse.microprofile.jwt.JsonWebToken
 import java.util.*
 
@@ -68,6 +71,29 @@ class TransactionStatisticsResource(
                 currencyProfileIdAndUser,
                 month,
                 year
+            )
+        )
+    }
+
+    @GET
+    @Path("/category")
+    fun getDailyTransactionStatistics(
+        @QueryParam("currencyProfileId") currencyProfileId: UUID,
+        @QueryParam("month") month: Int,
+        @QueryParam("year") year: Int,
+        @QueryParam("type") type: TransactionTypeEnum
+    ): Uni<List<CategoryTransactionStatistic>> {
+        val currencyProfileIdAndUser = ObjectIdUserProps(
+            currencyProfileId,
+            UUID.fromString(jwt.subject)
+        )
+
+        return service.getCategoryStatistics(
+            CategoryStatisticsProps(
+                currencyProfileIdAndUser,
+                month,
+                year,
+                type
             )
         )
     }

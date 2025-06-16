@@ -11,6 +11,7 @@ data class TransactionChangeProps(
     val id: UUID,
     var type: TransactionTypeEnum,
     val date: LocalDateTime,
+    var category: String,
     val currencyProfileId: UUID,
     val userId: UUID,
     val sum: BigDecimal,

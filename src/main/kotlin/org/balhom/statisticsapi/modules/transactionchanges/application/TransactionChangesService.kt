@@ -21,13 +21,17 @@ class TransactionChangesService(
         val sumTransactionStatisticProps = if (props.type == TransactionTypeEnum.INCOME)
             SumTransactionStatisticProps(
                 props.currencyProfileId,
+                props.type,
                 props.date,
+                props.category,
                 props.sum,
                 BigDecimal(0.0),
             ) else
             SumTransactionStatisticProps(
                 props.currencyProfileId,
+                props.type,
                 props.date,
+                props.category,
                 BigDecimal(0.0),
                 props.sum,
             )
