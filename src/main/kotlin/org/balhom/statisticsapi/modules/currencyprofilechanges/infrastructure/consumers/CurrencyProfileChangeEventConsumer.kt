@@ -1,5 +1,6 @@
 package org.balhom.statisticsapi.modules.currencyprofilechanges.infrastructure.consumers
 
+import io.quarkus.logging.Log
 import io.smallrye.common.annotation.Blocking
 import jakarta.enterprise.context.ApplicationScoped
 import org.balhom.statisticsapi.modules.currencyprofilechanges.application.CurrencyProfileChangesService
@@ -14,6 +15,8 @@ class CurrencyProfileChangeEventConsumer(
     @Incoming("currency-profile-events")
     @Blocking
     fun receive(event: CurrencyProfileChangeEvent) {
+        Log.debug("Consuming Kafka currency profile event: " + event.id)
+
         currencyProfileChangesService
             .processChange(
                 event.toChangeProps()

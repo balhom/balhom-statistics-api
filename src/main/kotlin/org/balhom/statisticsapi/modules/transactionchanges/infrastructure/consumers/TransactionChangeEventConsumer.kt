@@ -1,5 +1,6 @@
 package org.balhom.statisticsapi.modules.transactionchanges.infrastructure.consumers
 
+import io.quarkus.logging.Log
 import io.smallrye.common.annotation.Blocking
 import jakarta.enterprise.context.ApplicationScoped
 import org.balhom.statisticsapi.modules.transactionchanges.application.TransactionChangesService
@@ -14,6 +15,8 @@ class TransactionChangeEventConsumer(
     @Incoming("transaction-events")
     @Blocking
     fun receive(event: TransactionChangeEvent) {
+        Log.info("Consuming Kafka transaction change event: " + event.id)
+
         transactionChangesService
             .processChange(
                 event.toChangeProps()
