@@ -8,3 +8,34 @@ quarkus:
     idle-timeout: 5m
   mongodb:
     uuid-representation: STANDARD
+
+kafka:
+  consumer:
+    reconnect:
+      backoff:
+        ms: 1000
+        max:
+          ms: 10000
+    retry:
+      backoff:
+        ms: 1000
+    request:
+      timeout:
+        ms: 30000
+    session:
+      timeout:
+        ms: 30000
+
+mp:
+  messaging:
+    incoming:
+      transaction-events:
+        connector: smallrye-kafka
+        topic: transaction-events
+        group:
+          id: statistics-group
+      currency-profile-events:
+        connector: smallrye-kafka
+        topic: currency-profile-events
+        group:
+          id: statistics-group

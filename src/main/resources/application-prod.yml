@@ -25,17 +25,3 @@ quarkus:
 kafka:
   bootstrap:
     servers: ${KAFKA_SERVERS}
-
-mp:
-  messaging:
-    incoming:
-      transaction-events:
-        connector: smallrye-kafka
-        topic: transaction-events
-        group:
-          id: statistics-group
-      currency-profile-events:
-        connector: smallrye-kafka
-        topic: currency-profile-events
-        group:
-          id: statistics-group

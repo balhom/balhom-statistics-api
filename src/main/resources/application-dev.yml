@@ -27,17 +27,3 @@ quarkus:
 kafka:
   bootstrap:
     servers: PLAINTEXT_HOST://localhost:9092
-
-mp:
-  messaging:
-    incoming:
-      transaction-events:
-        connector: smallrye-kafka
-        topic: transaction-events
-        group:
-          id: statistics-group
-      currency-profile-events:
-        connector: smallrye-kafka
-        topic: currency-profile-events
-        group:
-          id: statistics-group
