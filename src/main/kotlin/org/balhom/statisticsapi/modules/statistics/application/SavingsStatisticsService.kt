@@ -10,6 +10,7 @@ import org.balhom.statisticsapi.modules.statistics.domain.props.MonthlyStatistic
 import org.balhom.statisticsapi.modules.statistics.domain.props.SumSavingsStatisticProps
 import org.balhom.statisticsapi.modules.statistics.domain.repositories.MonthlySavingsStatisticRepository
 import org.balhom.statisticsapi.modules.statistics.domain.repositories.YearlySavingsStatisticRepository
+import java.util.*
 
 @ApplicationScoped
 class SavingsStatisticsService(
@@ -79,5 +80,13 @@ class SavingsStatisticsService(
         yearlySavingsStatisticsRepository.save(
             yearlyStatistic
         )
+    }
+
+    fun deleteAll(currencyProfileId: UUID) {
+        monthlySavingsStatisticsRepository
+            .deleteAllByCurrencyProfileId(currencyProfileId)
+
+        yearlySavingsStatisticsRepository
+            .deleteAllByCurrencyProfileId(currencyProfileId)
     }
 }
