@@ -14,6 +14,7 @@ import org.balhom.statisticsapi.modules.statistics.domain.repositories.CategoryT
 import org.balhom.statisticsapi.modules.statistics.domain.repositories.DailyTransactionStatisticRepository
 import org.balhom.statisticsapi.modules.statistics.domain.repositories.MonthlyTransactionStatisticRepository
 import org.balhom.statisticsapi.modules.transactionchanges.domain.enums.TransactionTypeEnum
+import java.math.BigDecimal
 import java.util.*
 
 @ApplicationScoped
@@ -111,34 +112,38 @@ class TransactionStatisticsService(
         )
 
         // Add income sum for category statistic
-        val incomeCategoryStatistic = categoryTransactionStatisticRepository
-            .findByCurrencyProfileIdAndTypeAndCategoryAndMonthAndYear(
-                currencyProfileId = props.currencyProfileId,
-                type = TransactionTypeEnum.INCOME,
-                category = props.category,
-                month = props.date.monthValue,
-                year = props.date.year,
-            )
-        incomeCategoryStatistic.value += props.sumIncome
+        if (props.sumIncome != BigDecimal(0.0)) {
+            val incomeCategoryStatistic = categoryTransactionStatisticRepository
+                .findByCurrencyProfileIdAndTypeAndCategoryAndMonthAndYear(
+                    currencyProfileId = props.currencyProfileId,
+                    type = TransactionTypeEnum.INCOME,
+                    category = props.category,
+                    month = props.date.monthValue,
+                    year = props.date.year,
+                )
+            incomeCategoryStatistic.value += props.sumIncome
 
-        categoryTransactionStatisticRepository.save(
-            incomeCategoryStatistic
-        )
+            categoryTransactionStatisticRepository.save(
+                incomeCategoryStatistic
+            )
+        }
 
         // Add expenses sum for category statistic
-        val expenseCategoryStatistic = categoryTransactionStatisticRepository
-            .findByCurrencyProfileIdAndTypeAndCategoryAndMonthAndYear(
-                currencyProfileId = props.currencyProfileId,
-                type = TransactionTypeEnum.EXPENSE,
-                category = props.category,
-                month = props.date.monthValue,
-                year = props.date.year,
-            )
-        expenseCategoryStatistic.value += props.sumExpenses
+        if (props.sumExpenses != BigDecimal(0.0)) {
+            val expenseCategoryStatistic = categoryTransactionStatisticRepository
+                .findByCurrencyProfileIdAndTypeAndCategoryAndMonthAndYear(
+                    currencyProfileId = props.currencyProfileId,
+                    type = TransactionTypeEnum.EXPENSE,
+                    category = props.category,
+                    month = props.date.monthValue,
+                    year = props.date.year,
+                )
+            expenseCategoryStatistic.value += props.sumExpenses
 
-        categoryTransactionStatisticRepository.save(
-            expenseCategoryStatistic
-        )
+            categoryTransactionStatisticRepository.save(
+                expenseCategoryStatistic
+            )
+        }
     }
 
     fun deleteAll(currencyProfileId: UUID) {
