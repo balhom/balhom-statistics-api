@@ -210,7 +210,7 @@ class TransactionStatisticsService(
                     }
 
                 if (props.oldIncomeAdded != null) {
-                    oldIncomeCategoryStatistic.value += props.oldIncomeAdded
+                    oldIncomeCategoryStatistic.value -= props.oldIncomeAdded
                 }
 
                 categoryTransactionStatisticRepository.save(oldIncomeCategoryStatistic)
@@ -250,7 +250,7 @@ class TransactionStatisticsService(
                     }
 
                 if (props.oldExpensesAdded != null) {
-                    oldExpenseCategoryStatistic.value += props.oldExpensesAdded
+                    oldExpenseCategoryStatistic.value -= props.oldExpensesAdded
                 }
 
                 categoryTransactionStatisticRepository.save(oldExpenseCategoryStatistic)
