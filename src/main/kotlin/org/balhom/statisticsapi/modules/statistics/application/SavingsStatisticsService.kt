@@ -99,7 +99,10 @@ class SavingsStatisticsService(
         monthlySavingsStatisticsRepository.save(monthlyStatistic)
 
         if (props.oldDate != null) {
-            val oldMonthlyStatistic = if (props.date == props.oldDate) {
+            val oldMonthlyStatistic = if (
+                props.date.month == props.oldDate.month
+                && props.date.year == props.oldDate.year
+            ) {
                 monthlyStatistic
             } else {
                 monthlySavingsStatisticsRepository
@@ -132,7 +135,9 @@ class SavingsStatisticsService(
         yearlySavingsStatisticsRepository.save(yearlyStatistic)
 
         if (props.oldDate != null) {
-            val oldYearlyStatistic = if (props.date == props.oldDate) {
+            val oldYearlyStatistic = if (
+                props.date.year == props.oldDate.year
+            ) {
                 yearlyStatistic
             } else {
                 yearlySavingsStatisticsRepository

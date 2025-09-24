@@ -115,7 +115,11 @@ class TransactionStatisticsService(
         )
 
         if (props.oldDate != null) {
-            val oldDailyStatistic = if (props.date == props.oldDate) {
+            val oldDailyStatistic = if (
+                props.date.dayOfMonth == props.oldDate.dayOfMonth
+                && props.date.monthValue == props.oldDate.monthValue
+                && props.date.year == props.oldDate.year
+            ) {
                 dailyStatistic
             } else {
                 dailyTransactionStatisticRepository
@@ -156,7 +160,10 @@ class TransactionStatisticsService(
         monthlyTransactionStatisticRepository.save(monthlyStatistic)
 
         if (props.oldDate != null) {
-            val oldMonthlyStatistic = if (props.date == props.oldDate) {
+            val oldMonthlyStatistic = if (
+                props.date.monthValue == props.oldDate.monthValue
+                && props.date.year == props.oldDate.year
+            ) {
                 monthlyStatistic
             } else {
                 monthlyTransactionStatisticRepository
@@ -196,7 +203,11 @@ class TransactionStatisticsService(
 
             if (props.oldDate != null && props.oldCategory != null) {
                 val oldIncomeCategoryStatistic =
-                    if (props.date == props.oldDate && props.category == props.oldCategory) {
+                    if (
+                        props.date.monthValue == props.oldDate.monthValue
+                        && props.date.year == props.oldDate.year
+                        && props.category == props.oldCategory
+                    ) {
                         incomeCategoryStatistic
                     } else {
                         categoryTransactionStatisticRepository
@@ -236,7 +247,11 @@ class TransactionStatisticsService(
 
             if (props.oldDate != null && props.oldCategory != null) {
                 val oldExpenseCategoryStatistic =
-                    if (props.date == props.oldDate && props.category == props.oldCategory) {
+                    if (
+                        props.date.monthValue == props.oldDate.monthValue
+                        && props.date.year == props.oldDate.year
+                        && props.category == props.oldCategory
+                    ) {
                         expenseCategoryStatistic
                     } else {
                         categoryTransactionStatisticRepository
