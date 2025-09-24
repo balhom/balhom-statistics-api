@@ -100,7 +100,7 @@ class SavingsStatisticsService(
 
         if (props.oldDate != null) {
             val oldMonthlyStatistic = if (
-                props.date.month == props.oldDate.month
+                props.date.monthValue == props.oldDate.monthValue
                 && props.date.year == props.oldDate.year
             ) {
                 monthlyStatistic
