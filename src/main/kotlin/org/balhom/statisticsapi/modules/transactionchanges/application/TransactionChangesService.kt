@@ -45,7 +45,11 @@ class TransactionChangesService(
             type = props.type,
             date = props.date,
             oldDate = props.oldDate,
-            amountToAdd = props.amount,
+            amountToAdd = if (props.type == TransactionTypeEnum.INCOME) {
+                props.amount
+            } else {
+                - props.amount
+            },
             oldAmountAdded = props.oldAmount,
             monthlyGoal = props.cpGoalMonthlySaving,
             yearlyGoal = props.cpGoalYearlySaving,
