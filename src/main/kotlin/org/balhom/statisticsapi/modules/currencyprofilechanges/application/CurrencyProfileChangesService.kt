@@ -6,8 +6,7 @@ import org.balhom.statisticsapi.common.data.enums.EventChangeTypeEnum.UPDATE
 import org.balhom.statisticsapi.modules.currencyprofilechanges.domain.props.CurrencyProfileChangeProps
 import org.balhom.statisticsapi.modules.statistics.application.SavingsStatisticsService
 import org.balhom.statisticsapi.modules.statistics.application.TransactionStatisticsService
-import org.balhom.statisticsapi.modules.statistics.domain.props.SumSavingsStatisticProps
-import java.math.BigDecimal
+import org.balhom.statisticsapi.modules.statistics.domain.props.GoalSavingsStatisticToUpdateProps
 import java.time.LocalDateTime
 
 @ApplicationScoped
@@ -19,13 +18,12 @@ class CurrencyProfileChangesService(
     fun processChange(props: CurrencyProfileChangeProps) {
         when {
             props.eventChangeTypeEnum == UPDATE -> {
-                savingsStatisticsService.addSum(
-                    SumSavingsStatisticProps(
-                        props.currencyProfileId,
-                        LocalDateTime.now(),
-                        BigDecimal(0.0),
-                        props.monthlyGoal,
-                        props.yearlyGoal,
+                savingsStatisticsService.updateGoals(
+                    GoalSavingsStatisticToUpdateProps(
+                        currencyProfileId = props.currencyProfileId,
+                        date = LocalDateTime.now(),
+                        monthlyGoal = props.monthlyGoal,
+                        yearlyGoal = props.yearlyGoal,
                     )
                 )
             }

@@ -6,7 +6,7 @@ import org.balhom.statisticsapi.modules.transactionchanges.domain.enums.Transact
 import org.balhom.statisticsapi.modules.transactionchanges.domain.props.TransactionChangeProps
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @RegisterForReflection
 data class TransactionChangeEvent(
@@ -14,7 +14,9 @@ data class TransactionChangeEvent(
     var id: UUID,
     var type: TransactionTypeEnum,
     var date: LocalDateTime,
+    var oldDate: LocalDateTime?,
     var category: String,
+    var oldCategory: String?,
     var amount: BigDecimal,
     var oldAmount: BigDecimal?,
     var cpGoalMonthlySaving: BigDecimal,
@@ -24,16 +26,20 @@ data class TransactionChangeEvent(
 ) {
     fun toChangeProps(): TransactionChangeProps {
         return TransactionChangeProps(
-            EventChangeTypeEnum.fromAction(action),
-            id,
-            type,
-            date,
-            category,
-            currencyProfileId,
-            userId,
-            amount - (oldAmount ?: BigDecimal(0.0)),
-            cpGoalMonthlySaving,
-            cpGoalYearlySaving,
+            eventChangeType = EventChangeTypeEnum
+                .fromAction(action),
+            id = id,
+            type = type,
+            date = date,
+            oldDate = oldDate,
+            category = category,
+            oldCategory = oldCategory,
+            amount = amount,
+            oldAmount = oldAmount,
+            cpGoalMonthlySaving = cpGoalMonthlySaving,
+            cpGoalYearlySaving = cpGoalYearlySaving,
+            currencyProfileId = currencyProfileId,
+            userId = userId,
         )
     }
 }

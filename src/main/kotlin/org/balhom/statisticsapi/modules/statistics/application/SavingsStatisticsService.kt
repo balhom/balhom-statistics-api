@@ -6,11 +6,12 @@ import org.balhom.statisticsapi.common.data.props.ObjectIdUserProps
 import org.balhom.statisticsapi.modules.currencyprofilechanges.application.CurrencyProfileService
 import org.balhom.statisticsapi.modules.statistics.domain.models.MonthlySavingsStatistic
 import org.balhom.statisticsapi.modules.statistics.domain.models.YearlySavingsStatistic
+import org.balhom.statisticsapi.modules.statistics.domain.props.GoalSavingsStatisticToUpdateProps
 import org.balhom.statisticsapi.modules.statistics.domain.props.MonthlyStatisticsProps
-import org.balhom.statisticsapi.modules.statistics.domain.props.SumSavingsStatisticProps
+import org.balhom.statisticsapi.modules.statistics.domain.props.SavingsStatisticToAddProps
 import org.balhom.statisticsapi.modules.statistics.domain.repositories.MonthlySavingsStatisticRepository
 import org.balhom.statisticsapi.modules.statistics.domain.repositories.YearlySavingsStatisticRepository
-import java.util.*
+import java.util.UUID
 
 @ApplicationScoped
 class SavingsStatisticsService(
@@ -54,32 +55,99 @@ class SavingsStatisticsService(
             }
     }
 
-    fun addSum(props: SumSavingsStatisticProps) {
-        // Add sum and goals for monthly statistic
+    fun updateGoals(props: GoalSavingsStatisticToUpdateProps) {
         val monthlyStatistic = monthlySavingsStatisticsRepository
             .findByCurrencyProfileIdAndMonthAndYear(
                 currencyProfileId = props.currencyProfileId,
                 month = props.date.monthValue,
                 year = props.date.year
             )
-        monthlyStatistic.savings += props.sum
         monthlyStatistic.goal = props.monthlyGoal
 
-        // Add sum and goals for monthly statistic
+        monthlySavingsStatisticsRepository.save(monthlyStatistic)
+
         val yearlyStatistic = yearlySavingsStatisticsRepository
             .findByCurrencyProfileIdAndYear(
                 currencyProfileId = props.currencyProfileId,
                 year = props.date.year
             )
-        yearlyStatistic.savings += props.sum
         yearlyStatistic.goal = props.yearlyGoal
 
-        monthlySavingsStatisticsRepository.save(
-            monthlyStatistic
-        )
-        yearlySavingsStatisticsRepository.save(
-            yearlyStatistic
-        )
+        yearlySavingsStatisticsRepository.save(yearlyStatistic)
+    }
+
+    fun add(props: SavingsStatisticToAddProps) {
+        // Add savings and goals for monthly statistic
+        addToMonthlySavingsStatistic(props)
+
+        // Add savings and goals for yearly statistic
+        addToYearlySavingsStatistic(props)
+    }
+
+    private fun addToMonthlySavingsStatistic(
+        props: SavingsStatisticToAddProps
+    ) {
+        val monthlyStatistic = monthlySavingsStatisticsRepository
+            .findByCurrencyProfileIdAndMonthAndYear(
+                currencyProfileId = props.currencyProfileId,
+                month = props.date.monthValue,
+                year = props.date.year
+            )
+        monthlyStatistic.savings += props.amountToAdd
+        monthlyStatistic.goal = props.monthlyGoal
+
+        monthlySavingsStatisticsRepository.save(monthlyStatistic)
+
+        if (props.oldDate != null) {
+            val oldMonthlyStatistic = if (props.date == props.oldDate) {
+                monthlyStatistic
+            } else {
+                monthlySavingsStatisticsRepository
+                    .findByCurrencyProfileIdAndMonthAndYear(
+                        currencyProfileId = props.currencyProfileId,
+                        month = props.oldDate.monthValue,
+                        year = props.oldDate.year
+                    )
+            }
+
+            if (props.oldAmountAdded != null) {
+                oldMonthlyStatistic.savings -= props.oldAmountAdded !!
+            }
+
+            monthlySavingsStatisticsRepository.save(oldMonthlyStatistic)
+        }
+    }
+
+    private fun addToYearlySavingsStatistic(
+        props: SavingsStatisticToAddProps
+    ) {
+        val yearlyStatistic = yearlySavingsStatisticsRepository
+            .findByCurrencyProfileIdAndYear(
+                currencyProfileId = props.currencyProfileId,
+                year = props.date.year
+            )
+        yearlyStatistic.savings += props.amountToAdd
+        yearlyStatistic.goal = props.yearlyGoal
+
+        yearlySavingsStatisticsRepository.save(yearlyStatistic)
+
+        if (props.oldDate != null) {
+            val oldYearlyStatistic = if (props.date == props.oldDate) {
+                yearlyStatistic
+            } else {
+                yearlySavingsStatisticsRepository
+                    .findByCurrencyProfileIdAndYear(
+                        currencyProfileId = props.currencyProfileId,
+                        year = props.oldDate.year
+                    )
+            }
+
+            if (props.oldAmountAdded != null) {
+                oldYearlyStatistic.savings -= props.oldAmountAdded !!
+            }
+
+            yearlySavingsStatisticsRepository.save(oldYearlyStatistic)
+        }
     }
 
     fun deleteAll(currencyProfileId: UUID) {

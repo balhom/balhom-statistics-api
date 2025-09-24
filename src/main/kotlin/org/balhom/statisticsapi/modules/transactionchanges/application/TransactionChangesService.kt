@@ -3,8 +3,8 @@ package org.balhom.statisticsapi.modules.transactionchanges.application
 import jakarta.enterprise.context.ApplicationScoped
 import org.balhom.statisticsapi.modules.statistics.application.SavingsStatisticsService
 import org.balhom.statisticsapi.modules.statistics.application.TransactionStatisticsService
-import org.balhom.statisticsapi.modules.statistics.domain.props.SumSavingsStatisticProps
-import org.balhom.statisticsapi.modules.statistics.domain.props.SumTransactionStatisticProps
+import org.balhom.statisticsapi.modules.statistics.domain.props.SavingsStatisticToAddProps
+import org.balhom.statisticsapi.modules.statistics.domain.props.TransactionStatisticToAddProps
 import org.balhom.statisticsapi.modules.transactionchanges.domain.enums.TransactionTypeEnum
 import org.balhom.statisticsapi.modules.transactionchanges.domain.props.TransactionChangeProps
 import java.math.BigDecimal
@@ -16,48 +16,46 @@ class TransactionChangesService(
 ) {
 
     fun processChange(props: TransactionChangeProps) {
-        // If the transaction change is of type Income then the sum must be sum of income,
-        // otherwise it must be sum of expense.
-        val sumTransactionStatisticProps = if (props.type == TransactionTypeEnum.INCOME)
-            SumTransactionStatisticProps(
-                props.currencyProfileId,
-                props.type,
-                props.date,
-                props.category,
-                props.sum,
-                BigDecimal(0.0),
+        val transactionStatisticToAddProps = if (props.type == TransactionTypeEnum.INCOME)
+            TransactionStatisticToAddProps(
+                currencyProfileId = props.currencyProfileId,
+                date = props.date,
+                oldDate = props.oldDate,
+                category = props.category,
+                oldCategory = props.oldCategory,
+                incomeToAdd = props.amount,
+                oldIncomeAdded = props.oldAmount,
+                expensesToAdd = BigDecimal(0.0),
+                oldExpensesAdded = null
             ) else
-            SumTransactionStatisticProps(
-                props.currencyProfileId,
-                props.type,
-                props.date,
-                props.category,
-                BigDecimal(0.0),
-                props.sum,
-            )
-        // If the exchange rate of the transaction is Income then the sum
-        // is positive for savings, otherwise it must be negative.
-        val sumSavingsStatisticProps = if (props.type == TransactionTypeEnum.INCOME)
-            SumSavingsStatisticProps(
-                props.currencyProfileId,
-                props.date,
-                props.sum,
-                props.cpGoalMonthlySaving,
-                props.cpGoalYearlySaving,
-            ) else
-            SumSavingsStatisticProps(
-                props.currencyProfileId,
-                props.date,
-                -props.sum,
-                props.cpGoalMonthlySaving,
-                props.cpGoalYearlySaving,
+            TransactionStatisticToAddProps(
+                currencyProfileId = props.currencyProfileId,
+                date = props.date,
+                oldDate = props.oldDate,
+                category = props.category,
+                oldCategory = props.oldCategory,
+                incomeToAdd = BigDecimal(0.0),
+                oldIncomeAdded = null,
+                expensesToAdd = props.amount,
+                oldExpensesAdded = props.oldAmount
             )
 
-        transactionStatisticsService.addSum(
-            sumTransactionStatisticProps
+        val savingsStatisticToAddProps = SavingsStatisticToAddProps(
+            currencyProfileId = props.currencyProfileId,
+            type = props.type,
+            date = props.date,
+            oldDate = props.oldDate,
+            amountToAdd = props.amount,
+            oldAmountAdded = props.oldAmount,
+            monthlyGoal = props.cpGoalMonthlySaving,
+            yearlyGoal = props.cpGoalYearlySaving,
         )
-        savingsStatisticsService.addSum(
-            sumSavingsStatisticProps
+
+        transactionStatisticsService.add(
+            transactionStatisticToAddProps
+        )
+        savingsStatisticsService.add(
+            savingsStatisticToAddProps
         )
     }
 }

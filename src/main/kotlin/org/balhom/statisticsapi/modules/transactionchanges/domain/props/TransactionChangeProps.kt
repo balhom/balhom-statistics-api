@@ -7,14 +7,17 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class TransactionChangeProps(
-    val eventChangeTypeEnum: EventChangeTypeEnum,
+    val eventChangeType: EventChangeTypeEnum,
     val id: UUID,
     var type: TransactionTypeEnum,
     val date: LocalDateTime,
+    var oldDate: LocalDateTime?,
     var category: String,
-    val currencyProfileId: UUID,
-    val userId: UUID,
-    val sum: BigDecimal,
+    var oldCategory: String?,
+    var amount: BigDecimal,
+    var oldAmount: BigDecimal?,
     var cpGoalMonthlySaving: BigDecimal,
     var cpGoalYearlySaving: BigDecimal,
+    val currencyProfileId: UUID,
+    val userId: UUID,
 )

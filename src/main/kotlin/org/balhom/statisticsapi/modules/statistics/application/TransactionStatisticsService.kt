@@ -9,13 +9,13 @@ import org.balhom.statisticsapi.modules.statistics.domain.models.MonthlyTransact
 import org.balhom.statisticsapi.modules.statistics.domain.props.CategoryStatisticsProps
 import org.balhom.statisticsapi.modules.statistics.domain.props.DailyStatisticsProps
 import org.balhom.statisticsapi.modules.statistics.domain.props.MonthlyStatisticsProps
-import org.balhom.statisticsapi.modules.statistics.domain.props.SumTransactionStatisticProps
+import org.balhom.statisticsapi.modules.statistics.domain.props.TransactionStatisticToAddProps
 import org.balhom.statisticsapi.modules.statistics.domain.repositories.CategoryTransactionStatisticRepository
 import org.balhom.statisticsapi.modules.statistics.domain.repositories.DailyTransactionStatisticRepository
 import org.balhom.statisticsapi.modules.statistics.domain.repositories.MonthlyTransactionStatisticRepository
 import org.balhom.statisticsapi.modules.transactionchanges.domain.enums.TransactionTypeEnum
 import java.math.BigDecimal
-import java.util.*
+import java.util.UUID
 
 @ApplicationScoped
 class TransactionStatisticsService(
@@ -82,8 +82,23 @@ class TransactionStatisticsService(
             }
     }
 
-    fun addSum(props: SumTransactionStatisticProps) {
-        // Add expenses and income sum for daily statistic
+    fun add(props: TransactionStatisticToAddProps) {
+        // Add expenses and income for daily statistic
+        addToDailyTransactionStatistic(props)
+
+        // Add expenses and income for monthly statistic
+        addToMonthlyTransactionStatistic(props)
+
+        // Add income for category statistic
+        addToIncomeCategoryTransactionStatistic(props)
+
+        // Add expenses for category statistic
+        addToExpenseCategoryTransactionStatistic(props)
+    }
+
+    private fun addToDailyTransactionStatistic(
+        props: TransactionStatisticToAddProps
+    ) {
         val dailyStatistic = dailyTransactionStatisticRepository
             .findByCurrencyProfileIdAndDayAndMonthAndYear(
                 currencyProfileId = props.currencyProfileId,
@@ -91,28 +106,82 @@ class TransactionStatisticsService(
                 month = props.date.monthValue,
                 year = props.date.year
             )
-        dailyStatistic.income += props.sumIncome
-        dailyStatistic.expenses += props.sumExpenses
 
-        // Add expenses and income sum for monthly statistic
+        dailyStatistic.income += props.incomeToAdd
+        dailyStatistic.expenses += props.expensesToAdd
+
+        dailyTransactionStatisticRepository.save(
+            dailyStatistic
+        )
+
+        if (props.oldDate != null) {
+            val oldDailyStatistic = if (props.date == props.oldDate) {
+                dailyStatistic
+            } else {
+                dailyTransactionStatisticRepository
+                    .findByCurrencyProfileIdAndDayAndMonthAndYear(
+                        currencyProfileId = props.currencyProfileId,
+                        day = props.oldDate.dayOfMonth,
+                        month = props.oldDate.monthValue,
+                        year = props.oldDate.year
+                    )
+            }
+
+            if (props.oldIncomeAdded != null) {
+                oldDailyStatistic.income -= props.oldIncomeAdded
+            }
+            if (props.oldExpensesAdded != null) {
+                oldDailyStatistic.expenses -= props.oldExpensesAdded
+            }
+
+            dailyTransactionStatisticRepository.save(
+                oldDailyStatistic
+            )
+        }
+    }
+
+    private fun addToMonthlyTransactionStatistic(
+        props: TransactionStatisticToAddProps
+    ) {
         val monthlyStatistic = monthlyTransactionStatisticRepository
             .findByCurrencyProfileIdAndMonthAndYear(
                 currencyProfileId = props.currencyProfileId,
                 month = props.date.monthValue,
                 year = props.date.year
             )
-        monthlyStatistic.income += props.sumIncome
-        monthlyStatistic.expenses += props.sumExpenses
 
-        dailyTransactionStatisticRepository.save(
-            dailyStatistic
-        )
-        monthlyTransactionStatisticRepository.save(
-            monthlyStatistic
-        )
+        monthlyStatistic.income += props.incomeToAdd
+        monthlyStatistic.expenses += props.expensesToAdd
 
-        // Add income sum for category statistic
-        if (props.sumIncome != BigDecimal(0.0)) {
+        monthlyTransactionStatisticRepository.save(monthlyStatistic)
+
+        if (props.oldDate != null) {
+            val oldMonthlyStatistic = if (props.date == props.oldDate) {
+                monthlyStatistic
+            } else {
+                monthlyTransactionStatisticRepository
+                    .findByCurrencyProfileIdAndMonthAndYear(
+                        currencyProfileId = props.currencyProfileId,
+                        month = props.oldDate.monthValue,
+                        year = props.oldDate.year
+                    )
+            }
+
+            if (props.oldIncomeAdded != null) {
+                oldMonthlyStatistic.income -= props.oldIncomeAdded
+            }
+            if (props.oldExpensesAdded != null) {
+                oldMonthlyStatistic.expenses -= props.oldExpensesAdded
+            }
+
+            monthlyTransactionStatisticRepository.save(oldMonthlyStatistic)
+        }
+    }
+
+    private fun addToIncomeCategoryTransactionStatistic(
+        props: TransactionStatisticToAddProps
+    ) {
+        if (props.incomeToAdd != BigDecimal(0.0)) {
             val incomeCategoryStatistic = categoryTransactionStatisticRepository
                 .findByCurrencyProfileIdAndTypeAndCategoryAndMonthAndYear(
                     currencyProfileId = props.currencyProfileId,
@@ -121,15 +190,38 @@ class TransactionStatisticsService(
                     month = props.date.monthValue,
                     year = props.date.year,
                 )
-            incomeCategoryStatistic.value += props.sumIncome
+            incomeCategoryStatistic.value += props.incomeToAdd
 
-            categoryTransactionStatisticRepository.save(
-                incomeCategoryStatistic
-            )
+            categoryTransactionStatisticRepository.save(incomeCategoryStatistic)
+
+            if (props.oldDate != null && props.oldCategory != null) {
+                val oldIncomeCategoryStatistic =
+                    if (props.date == props.oldDate && props.category == props.oldCategory) {
+                        incomeCategoryStatistic
+                    } else {
+                        categoryTransactionStatisticRepository
+                            .findByCurrencyProfileIdAndTypeAndCategoryAndMonthAndYear(
+                                currencyProfileId = props.currencyProfileId,
+                                type = TransactionTypeEnum.INCOME,
+                                category = props.oldCategory,
+                                month = props.oldDate.monthValue,
+                                year = props.oldDate.year,
+                            )
+                    }
+
+                if (props.oldIncomeAdded != null) {
+                    oldIncomeCategoryStatistic.value += props.oldIncomeAdded
+                }
+
+                categoryTransactionStatisticRepository.save(oldIncomeCategoryStatistic)
+            }
         }
+    }
 
-        // Add expenses sum for category statistic
-        if (props.sumExpenses != BigDecimal(0.0)) {
+    private fun addToExpenseCategoryTransactionStatistic(
+        props: TransactionStatisticToAddProps
+    ) {
+        if (props.expensesToAdd != BigDecimal(0.0)) {
             val expenseCategoryStatistic = categoryTransactionStatisticRepository
                 .findByCurrencyProfileIdAndTypeAndCategoryAndMonthAndYear(
                     currencyProfileId = props.currencyProfileId,
@@ -138,11 +230,31 @@ class TransactionStatisticsService(
                     month = props.date.monthValue,
                     year = props.date.year,
                 )
-            expenseCategoryStatistic.value += props.sumExpenses
+            expenseCategoryStatistic.value += props.expensesToAdd
 
-            categoryTransactionStatisticRepository.save(
-                expenseCategoryStatistic
-            )
+            categoryTransactionStatisticRepository.save(expenseCategoryStatistic)
+
+            if (props.oldDate != null && props.oldCategory != null) {
+                val oldExpenseCategoryStatistic =
+                    if (props.date == props.oldDate && props.category == props.oldCategory) {
+                        expenseCategoryStatistic
+                    } else {
+                        categoryTransactionStatisticRepository
+                            .findByCurrencyProfileIdAndTypeAndCategoryAndMonthAndYear(
+                                currencyProfileId = props.currencyProfileId,
+                                type = TransactionTypeEnum.EXPENSE,
+                                category = props.oldCategory,
+                                month = props.oldDate.monthValue,
+                                year = props.oldDate.year,
+                            )
+                    }
+
+                if (props.oldExpensesAdded != null) {
+                    oldExpenseCategoryStatistic.value += props.oldExpensesAdded
+                }
+
+                categoryTransactionStatisticRepository.save(oldExpenseCategoryStatistic)
+            }
         }
     }
 
