@@ -100,16 +100,16 @@ class SavingsStatisticsService(
 
         if (props.oldDate != null) {
             val oldMonthlyStatistic = if (
-                props.date.monthValue == props.oldDate.monthValue
-                && props.date.year == props.oldDate.year
+                props.date.monthValue == props.oldDate !!.monthValue
+                && props.date.year == props.oldDate !!.year
             ) {
                 monthlyStatistic
             } else {
                 monthlySavingsStatisticsRepository
                     .findByCurrencyProfileIdAndMonthAndYear(
                         currencyProfileId = props.currencyProfileId,
-                        month = props.oldDate.monthValue,
-                        year = props.oldDate.year
+                        month = props.oldDate !!.monthValue,
+                        year = props.oldDate !!.year
                     )
             }
 
@@ -136,14 +136,14 @@ class SavingsStatisticsService(
 
         if (props.oldDate != null) {
             val oldYearlyStatistic = if (
-                props.date.year == props.oldDate.year
+                props.date.year == props.oldDate !!.year
             ) {
                 yearlyStatistic
             } else {
                 yearlySavingsStatisticsRepository
                     .findByCurrencyProfileIdAndYear(
                         currencyProfileId = props.currencyProfileId,
-                        year = props.oldDate.year
+                        year = props.oldDate !!.year
                     )
             }
 

@@ -116,26 +116,26 @@ class TransactionStatisticsService(
 
         if (props.oldDate != null) {
             val oldDailyStatistic = if (
-                props.date.dayOfMonth == props.oldDate.dayOfMonth
-                && props.date.monthValue == props.oldDate.monthValue
-                && props.date.year == props.oldDate.year
+                props.date.dayOfMonth == props.oldDate !!.dayOfMonth
+                && props.date.monthValue == props.oldDate !!.monthValue
+                && props.date.year == props.oldDate !!.year
             ) {
                 dailyStatistic
             } else {
                 dailyTransactionStatisticRepository
                     .findByCurrencyProfileIdAndDayAndMonthAndYear(
                         currencyProfileId = props.currencyProfileId,
-                        day = props.oldDate.dayOfMonth,
-                        month = props.oldDate.monthValue,
-                        year = props.oldDate.year
+                        day = props.oldDate !!.dayOfMonth,
+                        month = props.oldDate !!.monthValue,
+                        year = props.oldDate !!.year
                     )
             }
 
             if (props.oldIncomeAdded != null) {
-                oldDailyStatistic.income -= props.oldIncomeAdded
+                oldDailyStatistic.income -= props.oldIncomeAdded !!
             }
             if (props.oldExpensesAdded != null) {
-                oldDailyStatistic.expenses -= props.oldExpensesAdded
+                oldDailyStatistic.expenses -= props.oldExpensesAdded !!
             }
 
             dailyTransactionStatisticRepository.save(
@@ -161,24 +161,24 @@ class TransactionStatisticsService(
 
         if (props.oldDate != null) {
             val oldMonthlyStatistic = if (
-                props.date.monthValue == props.oldDate.monthValue
-                && props.date.year == props.oldDate.year
+                props.date.monthValue == props.oldDate !!.monthValue
+                && props.date.year == props.oldDate !!.year
             ) {
                 monthlyStatistic
             } else {
                 monthlyTransactionStatisticRepository
                     .findByCurrencyProfileIdAndMonthAndYear(
                         currencyProfileId = props.currencyProfileId,
-                        month = props.oldDate.monthValue,
-                        year = props.oldDate.year
+                        month = props.oldDate !!.monthValue,
+                        year = props.oldDate !!.year
                     )
             }
 
             if (props.oldIncomeAdded != null) {
-                oldMonthlyStatistic.income -= props.oldIncomeAdded
+                oldMonthlyStatistic.income -= props.oldIncomeAdded !!
             }
             if (props.oldExpensesAdded != null) {
-                oldMonthlyStatistic.expenses -= props.oldExpensesAdded
+                oldMonthlyStatistic.expenses -= props.oldExpensesAdded !!
             }
 
             monthlyTransactionStatisticRepository.save(oldMonthlyStatistic)
@@ -204,8 +204,8 @@ class TransactionStatisticsService(
             if (props.oldDate != null && props.oldCategory != null) {
                 val oldIncomeCategoryStatistic =
                     if (
-                        props.date.monthValue == props.oldDate.monthValue
-                        && props.date.year == props.oldDate.year
+                        props.date.monthValue == props.oldDate !!.monthValue
+                        && props.date.year == props.oldDate !!.year
                         && props.category == props.oldCategory
                     ) {
                         incomeCategoryStatistic
@@ -214,14 +214,14 @@ class TransactionStatisticsService(
                             .findByCurrencyProfileIdAndTypeAndCategoryAndMonthAndYear(
                                 currencyProfileId = props.currencyProfileId,
                                 type = TransactionTypeEnum.INCOME,
-                                category = props.oldCategory,
-                                month = props.oldDate.monthValue,
-                                year = props.oldDate.year,
+                                category = props.oldCategory !!,
+                                month = props.oldDate !!.monthValue,
+                                year = props.oldDate !!.year,
                             )
                     }
 
                 if (props.oldIncomeAdded != null) {
-                    oldIncomeCategoryStatistic.value -= props.oldIncomeAdded
+                    oldIncomeCategoryStatistic.value -= props.oldIncomeAdded !!
                 }
 
                 categoryTransactionStatisticRepository.save(oldIncomeCategoryStatistic)
@@ -248,8 +248,8 @@ class TransactionStatisticsService(
             if (props.oldDate != null && props.oldCategory != null) {
                 val oldExpenseCategoryStatistic =
                     if (
-                        props.date.monthValue == props.oldDate.monthValue
-                        && props.date.year == props.oldDate.year
+                        props.date.monthValue == props.oldDate !!.monthValue
+                        && props.date.year == props.oldDate !!.year
                         && props.category == props.oldCategory
                     ) {
                         expenseCategoryStatistic
@@ -258,14 +258,14 @@ class TransactionStatisticsService(
                             .findByCurrencyProfileIdAndTypeAndCategoryAndMonthAndYear(
                                 currencyProfileId = props.currencyProfileId,
                                 type = TransactionTypeEnum.EXPENSE,
-                                category = props.oldCategory,
-                                month = props.oldDate.monthValue,
-                                year = props.oldDate.year,
+                                category = props.oldCategory !!,
+                                month = props.oldDate !!.monthValue,
+                                year = props.oldDate !!.year,
                             )
                     }
 
                 if (props.oldExpensesAdded != null) {
-                    oldExpenseCategoryStatistic.value -= props.oldExpensesAdded
+                    oldExpenseCategoryStatistic.value -= props.oldExpensesAdded !!
                 }
 
                 categoryTransactionStatisticRepository.save(oldExpenseCategoryStatistic)
