@@ -4,6 +4,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection
 import org.balhom.statisticsapi.common.data.enums.EventChangeTypeEnum
 import org.balhom.statisticsapi.modules.transactionchanges.domain.enums.TransactionTypeEnum
 import org.balhom.statisticsapi.modules.transactionchanges.domain.props.TransactionChangeProps
+import org.balhom.statisticsapi.modules.transactionchanges.domain.props.TransactionOldDataProps
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
@@ -31,11 +32,17 @@ data class TransactionChangeEvent(
             id = id,
             type = type,
             date = date,
-            oldDate = oldDate,
             category = category,
-            oldCategory = oldCategory,
             amount = amount,
-            oldAmount = oldAmount,
+            oldData = if (
+                oldDate == null
+                || oldCategory == null
+                || oldAmount == null
+            ) null else TransactionOldDataProps(
+                oldDate = oldDate !!,
+                oldCategory = oldCategory !!,
+                oldAmount = oldAmount !!
+            ),
             cpGoalMonthlySaving = cpGoalMonthlySaving,
             cpGoalYearlySaving = cpGoalYearlySaving,
             currencyProfileId = currencyProfileId,
